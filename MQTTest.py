@@ -1,39 +1,22 @@
 import sys
 import paho.mqtt.client as mqtt
 
-# The callback for when the client receives a CONNACK response from the server.
-def on_connect(client, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
-
-    # Subscribing in on_connect() means that if we lose the connection and
-    # reconnect then subscriptions will be renewed.
-    client.subscribe("zigbee2mqtt/LampeCave1")
-
-    client.publish("zigbee2mqtt/LampeCave1/set", b'{"state":"OFF"}')
-
-    
-
-# The callback for when a PUBLISH message is received from the server.
-def on_message(client, userdata, msg):
-    print(msg.topic+" "+str(msg.payload))
-    print("\n")
-    
-
 if __name__ == "__main__":
-    print(f"Arguments count: {len(sys.argv)}")
-    for i, arg in enumerate(sys.argv):
-        print(f"Argument {i:>6}: {arg}")
 
+    mode = sys.argv[1]
+    print(mode)
 
-client = mqtt.Client()
-client.on_connect = on_connect
-client.on_message = on_message
+    client = mqtt.Client()
 
-client.connect("192.168.1.20", 1883, 60)
+    client.connect("192.168.1.20", 1883, 60)
 
-# Blocking call that processes network traffic, dispatches callbacks and
-# handles reconnecting.
-# Other loop*() functions are available that give a threaded interface and a
-# manual interface.
-
-#client.loop_forever()
+    if mode == "off":
+        client.publish("zigbee2mqtt/LampeCave1/set", b'{"state":"OFF"}')
+    if mode == "on":
+        client.publish("zigbee2mqtt/LampeCave1/set", b'{"state":"ON"}')
+    if mode == "soir":
+        client.publish("zigbee2mqtt/LampeCave1/set", b'{"brightness":2,"color_temp":500}')
+    if mode == "jour":
+        client.publish("zigbee2mqtt/LampeCave1/set", b'{"brightness":254,"color_temp":150}')
+    if mode == "nuit":
+        client.publish("zigbee2mqtt/LampeCave1/set", b'{"color":{"x":0.14912280701754385,"y":0.06140350877192982},"brightness":254}')
